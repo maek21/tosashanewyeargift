@@ -1,12 +1,15 @@
-name: Deploy Static HTML to GitHub Pages
+name: Deploy Index.html to GitHub Pages
 
 on:
   push:
     branches:
-      - main  
+      - main
+
+permissions:
+  contents: write   # важно для пуша в gh-pages
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -16,4 +19,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./  
+          publish_dir: ./          # папка с index.html
+          publish_branch: main # ветка для GitHub Pages
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
