@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎄 С Новым годом, Саша</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { 
+      height: 100vh; height: 100dvh;
+      background: linear-gradient(160deg,#0a0e27,#1b254f,#3a2b5c);
+      display:flex; justify-content:center; align-items:center; overflow:hidden; color:white;
+      touch-action: manipulation;
+    }
+    .card {
+      background: rgba(255,255,255,0.14);
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      border-radius:30px;
+      padding:40px 32px;
+      text-align:center;
+      max-width:400px;
+      width: 90%;
+      box-shadow: 0 25px 70px rgba(0,0,0,.4);
+      position: relative;
+      z-index:10;
+      animation: appear 1.6s ease;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    h1 { 
+      font-size:1.9rem; 
+      margin-bottom:16px; 
+      text-shadow: 0 2px 10px rgba(255,255,255,0.3);
+      animation: glow 3s ease-in-out infinite;
+    }
+    .message { 
+      font-size:1.05rem; 
+      line-height:1.6; 
+      min-height:80px; 
+      transition: opacity .4s ease;
+    }
+    .buttons { display:flex; gap:12px; justify-content:center; margin-top:22px; flex-wrap:wrap; }
+    button {
+      padding:12px 24px; border-radius:999px; border:none; background:white; color:#2a2350;
+      font-size:1rem; cursor:pointer; transition: transform .2s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,.25);
+      font-weight: 600;
+    }
+    button:active { transform: scale(0.95); }
+    .from { margin-top:20px; font-size:.9rem; opacity:.7; }
+    @keyframes appear {
+      from { opacity:0; transform: translateY(30px) scale(.95); }
+      to { opacity:1; transform: translateY(0) scale(1); }
+    }
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 2px 10px rgba(255,255,255,0.3); }
+      50% { text-shadow: 0 2px 20px rgba(255,255,255,0.6), 0 0 30px rgba(255,200,255,0.4); }
+    }
+    @keyframes snowfall { to { transform: translateY(100vh); } }
+    canvas { position:fixed; top:0; left:0; z-index:1; pointer-events:none; }
+    #clickArea { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; }
+    .snowflake {
+      position: fixed; top: -10px; color: white; opacity: 0.7;
+      animation: snowfall linear infinite; z-index: 0; pointer-events: none;
+      will-change: transform;
+    }
+    .hint {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      font-size: 0.85rem; opacity: 0.5; z-index: 11; pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="clickArea"></div>
+  <canvas id="c"></canvas>
+
+  <div class="card">
+    <h1>🎄 С Новым годом, Саша</h1>
+    <div class="message" id="text">Пусть в новом году будет спокойно,<br>тепло и уютно ✨</div>
+    <div class="buttons">
+      <button onclick="nextMsg()">ещё пожелания❄️</button>
+      <button onclick="multiLaunch()">🎆 фейерверк</button>
+    </div>
+    <div class="from">от Марка с теплом</div>
+  </div>
+
+  <div class="hint">тапай для фейерверка ✨</div>
+
+  <script>
+    // Определяем мобильное устройство
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    
+    // Настройки под устройство
+    const CFG = {
+      particles: isMobile ? 60 : 100,
+      innerParticles: isMobile ? 15 : 30,
+      trailLen: isMobile ? 6 : 10,
+      snowCount: isMobile ? 12 : 20,
+      multiCount: isMobile ? 12 : 20
+    };
+
+    const msgs = [
+      "Пусть дни будут светлыми ☀️",
+      "Пусть сбудутся мечты ❄️",
+      "Пусть каждый день приносит что-то хорошее 🌟"
+    ];
+    let mi = 0;
+    function nextMsg(){
+      const t = document.getElementById("text");
+      t.style.opacity = 0;
+      setTimeout(() => { t.innerHTML = msgs[mi]; t.style.opacity = 1; mi = (mi+1) % msgs.length; }, 300);
+    }
+
+    // Снежинки - постоянно падают
+    function createSnowflake() {
+      const s = document.createElement('div');
+      s.className = 'snowflake';
+      s.textContent = '❄';
+      s.style.cssText = `left:${Math.random()*100}%;font-size:${Math.random()*0.6+0.4}em;animation-duration:${Math.random()*8+12}s`;
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 20000);
+    }
+    
+    // Создаём снежинки постоянно
+    for(let i = 0; i < 15; i++) setTimeout(createSnowflake, i * 300);
+    setInterval(createSnowflake, 800);
+
+    // Canvas с учётом DPR
+    const canvas = document.getElementById("c");
+    const ctx = canvas.getContext("2d", { alpha: false });
+    
+    function resize(){
+      const w = window.innerWidth, h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.scale(dpr, dpr);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const W = () => canvas.width / dpr;
+    const H = () => canvas.height / dpr;
+
+    // Пул объектов для переиспользования
+    const sparks = [];
+    const rockets = [];
+    const colors = ['255,50,50','255,200,50','50,255,150','50,200,255','255,100,200','200,100,255'];
+
+    // Оптимизированная частица
+    function Spark(x, y, c, a, spd, sz) {
+      this.reset(x, y, c, a, spd, sz);
+    }
+    Spark.prototype.reset = function(x, y, c, a, spd, sz) {
+      this.x = x; this.y = y; this.c = c;
+      this.vx = Math.cos(a) * spd;
+      this.vy = Math.sin(a) * spd;
+      this.sz = sz; this.life = 1;
+      this.decay = 0.018 + Math.random() * 0.012;
+      this.hx = []; this.hy = [];
+    };
+    Spark.prototype.update = function() {
+      if (this.life > 0.4) {
+        this.hx.push(this.x); this.hy.push(this.y);
+        if (this.hx.length > CFG.trailLen) { this.hx.shift(); this.hy.shift(); }
+      }
+      this.vy += 0.12;
+      this.vx *= 0.97; this.vy *= 0.97;
+      this.x += this.vx; this.y += this.vy;
+      this.life -= this.decay;
+    };
+    Spark.prototype.draw = function() {
+      const len = this.hx.length;
+      // Хвост одним path
+      if (len > 1) {
+        ctx.beginPath();
+        ctx.moveTo(this.hx[0], this.hy[0]);
+        for (let i = 1; i < len; i++) ctx.lineTo(this.hx[i], this.hy[i]);
+        ctx.strokeStyle = `rgba(${this.c},${this.life * 0.5})`;
+        ctx.lineWidth = this.sz * 0.8;
+        ctx.stroke();
+      }
+      // Частица
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.sz, 0, 6.28);
+      ctx.fillStyle = `rgba(${this.c},${this.life})`;
+      ctx.fill();
+    };
+
+    // Ракета
+    function Rocket(x, ty) {
+      this.x = x; this.y = H() + 10; this.ty = ty;
+      this.vy = -11; this.hx = []; this.hy = [];
+    }
+    Rocket.prototype.update = function() {
+      this.hx.push(this.x + (Math.random()-0.5)*2);
+      this.hy.push(this.y);
+      if (this.hx.length > 8) { this.hx.shift(); this.hy.shift(); }
+      this.vy += 0.22;
+      this.y += this.vy;
+      return this.vy >= 0 || this.y <= this.ty;
+    };
+    Rocket.prototype.draw = function() {
+      ctx.beginPath();
+      for (let i = 0; i < this.hx.length; i++) {
+        ctx.moveTo(this.hx[i], this.hy[i]);
+        ctx.arc(this.hx[i], this.hy[i], 1.5 * (i/this.hx.length), 0, 6.28);
+      }
+      ctx.fillStyle = 'rgba(255,200,100,0.7)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, 2.5, 0, 6.28);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+    };
+
+    function explode(x, y) {
+      const c1 = colors[Math.random()*colors.length|0];
+      const c2 = colors[Math.random()*colors.length|0];
+      const n = CFG.particles;
+      for (let i = 0; i < n; i++) {
+        const a = (6.28 * i) / n + Math.random() * 0.15;
+        const spd = 3.5 + Math.random() * 3.5;
+        sparks.push(new Spark(x, y, i%2 ? c1 : c2, a, spd, 1.8 + Math.random()));
+      }
+      for (let i = 0; i < CFG.innerParticles; i++) {
+        sparks.push(new Spark(x, y, '255,255,255', Math.random()*6.28, 1.5+Math.random()*2, 1.2));
+      }
+    }
+
+    function launch(x, ty) { rockets.push(new Rocket(x, ty)); }
+    
+    function randLaunch() {
+      launch(W()*0.15 + Math.random()*W()*0.7, H()*0.15 + Math.random()*H()*0.35);
+    }
+
+    function multiLaunch() {
+      for (let i = 0; i < CFG.multiCount; i++) setTimeout(randLaunch, i * 400);
+    }
+
+    // Главный цикл
+    function loop() {
+      ctx.fillStyle = 'rgba(10,14,39,0.22)';
+      ctx.fillRect(0, 0, W(), H());
+
+      for (let i = rockets.length - 1; i >= 0; i--) {
+        const r = rockets[i];
+        if (r.update()) { explode(r.x, r.y); rockets.splice(i, 1); }
+        else r.draw();
+      }
+
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.update();
+        s.draw();
+        if (s.life <= 0) sparks.splice(i, 1);
+      }
+
+      requestAnimationFrame(loop);
+    }
+    loop();
+
+    // Тач и клик
+    const area = document.getElementById('clickArea');
+    function handleTap(e) {
+      e.preventDefault();
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      const y = e.touches ? e.touches[0].clientY : e.clientY;
+      launch(x, y);
+    }
+    area.addEventListener('click', handleTap);
+    area.addEventListener('touchstart', handleTap, { passive: false });
+
+    // Приветствие
+    setTimeout(() => { for(let i=0;i<3;i++) setTimeout(randLaunch, i*600); }, 1000);
+  </script>
+
+</body>
+</html>
