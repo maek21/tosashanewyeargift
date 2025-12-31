@@ -20,6 +20,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./          # папка с index.html
-          publish_branch: main # ветка для GitHub Pages
+          publish_branch: gh-pages # ветка для GitHub Pages
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
